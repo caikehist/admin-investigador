@@ -9,12 +9,24 @@ class User extends CI_Controller {
         $this->load->model('User_model');
         // Carrega o helper de URL para usar a função 'base_url()'
         $this->load->helper('url');
+
+        if(!$this->session->userdata('logged_in'))
+        {
+            // Se não estiver logado, redireciona para o login
+            redirect('login');
+        }
     }
 
     // Exibe a lista de usuários (página principal)
     public function index() {
+        $data['title'] = 'Listar Usuários';
+        $main_content = 'users/list';
+
         $data['users'] = $this->User_model->get_users();
-        $this->load->view('users/list', $data);
+        $this->load->view('template_admin', [
+            'data'          => $data,
+            'main_content'  => $main_content,
+        ]);
     }
 
     // Formulário para adicionar um novo usuário

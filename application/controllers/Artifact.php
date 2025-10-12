@@ -11,12 +11,25 @@ class Artifact extends CI_Controller {
         // Carrega o helper de URL para usar a função 'base_url()'
         $this->load->helper('url');
         $this->load->library('upload');
+
+        if(!$this->session->userdata('logged_in'))
+        {
+            // Se não estiver logado, redireciona para o login
+            redirect('login');
+        }
     }
 
     // Exibe a lista de artefato (página principal)
     public function index() {
+
+        $data['title'] = 'Listar Artefatos';
+        $main_content = 'artifacts/list';
+
         $data['artifacts'] = $this->Artifact_model->get_artifacts();
-        $this->load->view('artifacts/list', $data);
+        $this->load->view('template_admin', [
+            'main_content'      => $main_content,
+            'data'              => $data,
+        ]);
     }
 
     // Formulário para adicionar um novo artefato

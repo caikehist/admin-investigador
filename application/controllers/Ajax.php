@@ -12,6 +12,12 @@ class Ajax extends CI_Controller {
         // Carrega o helper de URL para usar a função 'base_url()'
         $this->load->helper('url');
         $this->load->library('upload');
+
+        if(!$this->session->userdata('logged_in'))
+        {
+            // Se não estiver logado, redireciona para o login
+            redirect('login');
+        }
     }
 
     public function get_mission_by_name(){

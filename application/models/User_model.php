@@ -54,4 +54,48 @@ class User_model extends CI_Model {
 
         return $query->result();
     }
+
+    /**
+    *@param string $username
+    *@param string $password
+    *@return object|bool 
+    */
+    public function validate_login($username, $password){
+        $username = $this->security->xss_clean($username);
+
+        $this->db->select('id, name, password, type');
+        $this->db->where('name', $username);
+        $query = $this->db->get('users');
+
+        if($query->num_rows() == 1){
+            $user = $query->row();
+
+            if(password_verify($password, $user->password)){
+                // Senha correta
+                return $user;
+            }
+
+        }
+        // Usuário não encontrado ou senha incorreta
+        return FALSE;
+    }
+
+    /**
+    *@param array $data
+    *@return bool
+    */
+    public function register_user($data){
+
+        $result = $this->db->insert('users', $data);
+
+        if(!$result){
+            $error = $this->db->error();
+            log_message('error', 'DB Insert error: '. print_r($error, TRUE));
+
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+    
 }

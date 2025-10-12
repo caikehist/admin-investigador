@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    # Ativa o módulo de reescrita
+    RewriteEngine On
+    
+    # Se a requisição não for para um arquivo existente...
+    RewriteCond %{REQUEST_FILENAME} !-f
+    # ...e não for para um diretório existente...
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # ...então reescreva a URL para o index.php
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>

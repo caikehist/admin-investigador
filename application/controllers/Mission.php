@@ -13,6 +13,12 @@ class Mission extends CI_Controller {
         // Carrega o helper de URL para usar a função 'base_url()'
         $this->load->helper('url');
         $this->load->library('upload');
+
+        if(!$this->session->userdata('logged_in'))
+        {
+            // Se não estiver logado, redireciona para o login
+            redirect('login');
+        }
     }
 
     // Exibe a lista de artefato (página principal)
