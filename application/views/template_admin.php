@@ -65,7 +65,7 @@
                     <ul class="navbar-nav ms-auto">
                         
                         <li class="nav-item">
-                            <span class="nav-link"><?php echo $this->session->userdata('user_name');?> </span>
+                            <span class="nav-link"><?php echo $this->session->userdata('user_name');?> | <?php echo $this->session->userdata('type')?></span>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo base_url('login/logout')?>">Sair</a>
