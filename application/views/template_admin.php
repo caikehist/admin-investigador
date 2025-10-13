@@ -63,6 +63,10 @@
                 <div class="container-fluid">
                     <span class="navbar-brand mb-0 h1"><?php echo isset($data['titulo']) ? $data['titulo'] : 'Dashboard'; ?></span>
                     <ul class="navbar-nav ms-auto">
+                        
+                        <li class="nav-item">
+                            <span class="nav-link"><?php echo $this->session->userdata('user_name');?> </span>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo base_url('login/logout')?>">Sair</a>
                         </li>

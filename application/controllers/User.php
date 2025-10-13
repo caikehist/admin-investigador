@@ -31,15 +31,26 @@ class User extends CI_Controller {
 
     // Formulário para adicionar um novo usuário
     public function add() {
-        $this->load->view('users/add');
+        $data['title'] = 'Adicionar Usuário';
+        $main_content = 'users/add';
+
+        $this->load->view('template_admin', [
+            'data'          => $data,
+            'main_content'  => $main_content,
+        ]);
     }
 
     // Salva o novo usuário no banco de dados
     public function save() {
+        $password = $this->input->post('password');
+
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
         $data = array(
-            'name'  => $this->input->post('name'),
-            'desc' => $this->input->post('desc'),
-			'type' => $this->input->post('type')
+            'name'          => $this->input->post('name'),
+            'password'      => $hashed_password,
+            'desc'          => $this->input->post('desc'),
+			'type'          => $this->input->post('type')
         );
         $this->User_model->insert_user($data);
         redirect('user');
