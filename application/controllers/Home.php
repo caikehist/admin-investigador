@@ -18,19 +18,27 @@ class Home extends CI_Controller {
             // Se não estiver logado, redireciona para o login
             redirect('login');
         }
+
+        if($this->session->userdata('logged_in') && $this->session->userdata('type') == 'ALUNO'){
+            redirect('mission/map');
+        }
     }
 
     // Exibe a lista de artefato (página principal)
     public function index() {
+        if($this->session->userdata('logged_in') && $this->session->userdata('type') == 'ALUNO'){
+            redirect('mission/map');
+        } else {
 
-        $data['title'] = 'Home';
-        $main_content = 'home';
-        
-        $data['missions'] = $this->Mission_model->get_missions();
+            $data['title'] = 'Home';
+            $main_content = 'home';
+            
+            $data['missions'] = $this->Mission_model->get_missions();
 
-        $this->load->view('template_admin', [
-            'main_content'  => $main_content,
-            'data'          => $data
-        ]);
+            $this->load->view('template_admin', [
+                'main_content'  => $main_content,
+                'data'          => $data
+            ]);
+        }
     }
 }

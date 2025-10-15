@@ -17,45 +17,94 @@ class Artifact extends CI_Controller {
             // Se não estiver logado, redireciona para o login
             redirect('login');
         }
+
+        
+
+
     }
 
     // Exibe a lista de artefato (página principal)
     public function index() {
+        if($this->session->userdata('logged_in') && $this->session->userdata('type') == 'ALUNO'){
+            redirect('mission/map');
+        } else {
 
-        $data['title'] = 'Listar Artefatos';
-        $main_content = 'artifacts/list';
+            $data['title'] = 'Listar Artefatos';
+            $main_content = 'artifacts/list';
 
-        $data['artifacts'] = $this->Artifact_model->get_artifacts();
-        $this->load->view('template_admin', [
-            'main_content'      => $main_content,
-            'data'              => $data,
-        ]);
+            $data['artifacts'] = $this->Artifact_model->get_artifacts();
+            $this->load->view('template_admin', [
+                'main_content'      => $main_content,
+                'data'              => $data,
+            ]);
+        }
     }
 
     // Formulário para adicionar um novo artefato
     public function add() {
-        $data['users'] = $this->User_model->get_users();
-        $this->load->view('artifacts/add', $data);
+        if($this->session->userdata('logged_in') && $this->session->userdata('type') == 'ALUNO'){
+            redirect('mission/map');
+        } else {
+            $data['users'] = $this->User_model->get_users();
+            $this->load->view('artifacts/add', $data);
+        }
     }
 
     // Salva o novo artefato no banco de dados
     public function save() {
-        $config['upload_path'] = './uploads/';
-        $config['allowed_types'] = 'gif|jpg|jpeg|png|pdf|doc|docx|mp4|mp3';
-        $config['max_size'] = 5000;
-
-        // Inicializa a biblioteca upload do CI3 com a configuração informada
-        $this->upload->initialize($config);
-
-        if(!$this->upload->do_upload('artifact_file')){
-            $error = array('error' => $this->upload->display_errors());
-            $this->load->view('artifacts/add', $error);
-            exit;
+        if($this->session->userdata('logged_in') && $this->session->userdata('type') == 'ALUNO'){
+            redirect('mission/map');
         } else {
-            $upload_data = $this->upload->data();
-            //print_r($upload_data);exit;
-            $artifact_path = 'uploads/' . $upload_data['file_name'];
+            $config['upload_path'] = './uploads/';
+            $config['allowed_types'] = 'gif|jpg|jpeg|png|pdf|doc|docx|mp4|mp3';
+            $config['max_size'] = 5000;
 
+            // Inicializa a biblioteca upload do CI3 com a configuração informada
+            $this->upload->initialize($config);
+
+            if(!$this->upload->do_upload('artifact_file')){
+                $error = array('error' => $this->upload->display_errors());
+                $this->load->view('artifacts/add', $error);
+                exit;
+            } else {
+                $upload_data = $this->upload->data();
+                //print_r($upload_data);exit;
+                $artifact_path = 'uploads/' . $upload_data['file_name'];
+
+                $data = array(
+                    'artifact_name'  => $this->input->post('artifact_name'),
+                    'desc' => $this->input->post('desc'),
+                    'registry_date' => $this->input->post('registry_date'),
+                    'registered_by' => $this->input->post('registered_by'),
+                    'collected_date' => $this->input->post('collected_date'),
+                    'collected_by' => $this->input->post('collected_by'),
+                    'type' => $this->input->post('type'),
+                    'artifact_path' => $artifact_path,
+                );
+                $this->Artifact_model->insert_artifact($data);
+                redirect('artifact/edit/'.$this->db->insert_id());
+            }
+        }
+        
+    }
+
+    // Formulário para editar um artefato
+    public function edit($id) {
+        if($this->session->userdata('logged_in') && $this->session->userdata('type') == 'ALUNO'){
+            redirect('mission/map');
+        } else {
+
+            $data['artifact'] = $this->Artifact_model->get_artifact($id);
+            $data['user'] = $this->User_model->get_user($data['artifact']->collected_by);
+            $this->load->view('artifacts/edit', $data);
+        }
+    }
+
+    // Atualiza o artefato no banco de dados
+    public function update($id) {
+        if($this->session->userdata('logged_in') && $this->session->userdata('type') == 'ALUNO'){
+            redirect('mission/map');
+        } else {
             $data = array(
                 'artifact_name'  => $this->input->post('artifact_name'),
                 'desc' => $this->input->post('desc'),
@@ -64,45 +113,21 @@ class Artifact extends CI_Controller {
                 'collected_date' => $this->input->post('collected_date'),
                 'collected_by' => $this->input->post('collected_by'),
                 'type' => $this->input->post('type'),
-                'artifact_path' => $artifact_path,
             );
-            $this->Artifact_model->insert_artifact($data);
-            redirect('artifact/edit/'.$this->db->insert_id());
+            $this->Artifact_model->update_artifact($id, $data);
+            redirect('artifact');
         }
-
-        
-    }
-
-    // Formulário para editar um artefato
-    public function edit($id) {
-
-        $data['artifact'] = $this->Artifact_model->get_artifact($id);
-        $data['user'] = $this->User_model->get_user($data['artifact']->collected_by);
-        $this->load->view('artifacts/edit', $data);
-    }
-
-    // Atualiza o artefato no banco de dados
-    public function update($id) {
-        $data = array(
-            'artifact_name'  => $this->input->post('artifact_name'),
-            'desc' => $this->input->post('desc'),
-            'registry_date' => $this->input->post('registry_date'),
-            'registered_by' => $this->input->post('registered_by'),
-            'collected_date' => $this->input->post('collected_date'),
-            'collected_by' => $this->input->post('collected_by'),
-            'type' => $this->input->post('type'),
-        );
-        $this->Artifact_model->update_artifact($id, $data);
-        redirect('artifact');
     }
 
     // Deleta um artefato
     public function delete($id) {
-        $this->Artifact_model->delete_artifact($id);
-        redirect('artifact');
+        if($this->session->userdata('logged_in') && $this->session->userdata('type') == 'ALUNO'){
+            redirect('mission/map');
+        } else {
+            $this->Artifact_model->delete_artifact($id);
+            redirect('artifact');
+        }
     }
 
-    public function upload(){
-        echo "upload";
-    }
+   
 }
